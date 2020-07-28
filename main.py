@@ -1,5 +1,10 @@
-import playerBattingRecords
-import playerBowlingRecords
+from Records import playerBattingRecords
+from Records import playerBowlingRecords
+import projections
 
-pb = playerBattingRecords.playerBattingRecords()
-pb.test()
+
+bat = playerBattingRecords.playerBattingRecords()
+print(bat.test())
+
+# proj = projections.Projections()
+# proj.predict_batting()

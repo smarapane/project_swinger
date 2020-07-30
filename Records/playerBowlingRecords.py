@@ -6,24 +6,35 @@ class playerBowlingRecords:
     def __init__(self):
         data = open("cricclubs_data/cricclubs_data.json")
         self.cricclubs_data = json.load(data)
-        self.player_dfs = []
+        self.player_dfs = dict()
 
-        self.sid_dfs = pd.read_html(self.cricclubs_data["bowling"]["sid_bowl"])
-        self.sid_dfs[1]["Name"] = "Sidath"
-        self.vardhu_dfs = pd.read_html(self.cricclubs_data["bowling"]["vardhu_bowl"])
-        self.vardhu_dfs[1]["Name"] = "Vardhan"
-        self.teja_dfs = pd.read_html(self.cricclubs_data["bowling"]["teja_bowl"])
-        self.teja_dfs[1]["Name"] = "Teja"
-        self.sam_dfs = pd.read_html(self.cricclubs_data["bowling"]["sam_bowl"])
-        self.sam_dfs[1]["Name"] = "Sam"
-
-        self.player_dfs.append(self.sid_dfs)
-        self.player_dfs.append(self.vardhu_dfs)
-        self.player_dfs.append(self.teja_dfs)
-        self.player_dfs.append(self.sam_dfs)
+        self.player_dfs["Sidath Marapane"] = pd.read_html(
+            self.cricclubs_data["bowling"]["sid_bowl"]
+        )
+        self.player_dfs["Sidath Marapane"][1]["Name"] = "Sidath Marapane"
+        self.player_dfs["Vardhan Avarsala"] = pd.read_html(
+            self.cricclubs_data["bowling"]["vardhu_bowl"]
+        )
+        self.player_dfs["Vardhan Avarsala"][1]["Name"] = "Vardhan Avarsala"
+        self.player_dfs["Teja Bollimunta"] = pd.read_html(
+            self.cricclubs_data["bowling"]["teja_bowl"]
+        )
+        self.player_dfs["Teja Bollimunta"][1]["Name"] = "Teja Bollimunta"
+        self.player_dfs["Sam Thomas"] = pd.read_html(
+            self.cricclubs_data["bowling"]["sam_bowl"]
+        )
+        self.player_dfs["Sam Thomas"][1]["Name"] = "Sam Thomas"
+        self.player_dfs["Aaron Varghese"] = pd.read_html(
+            self.cricclubs_data["bowling"]["aaron_bowl"]
+        )
+        self.player_dfs["Aaron Varghese"][1]["Name"] = "Aaron Varghese"
+        self.player_dfs["Vibhav Kavoori"] = pd.read_html(
+            self.cricclubs_data["bowling"]["vibhav_bowl"]
+        )
+        self.player_dfs["Vibhav Kavoori"][1]["Name"] = "Vibhav Kavoori"
 
     def clean(self):
-        for i in range(len(self.player_dfs)):
+        for i in self.player_dfs:
             self.player_dfs[i] = self.player_dfs[i][1][
                 ["Name", "Match Date", "Overs", "Runs", "Wkts", "Econ", "Wides"]
             ]
@@ -34,7 +45,10 @@ class playerBowlingRecords:
                 self.player_dfs[i]["Match Date"]
             )
 
+    def getPlayers(self):
         return self.player_dfs
 
     def test(self):
-        print(self.clean())
+        self.clean()
+        for i in self.player_dfs:
+            print(self.player_dfs[i])

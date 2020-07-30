@@ -3,6 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 import json
 from datetime import datetime as dt
+from helper import getMatchInfo
 
 
 class playerBattingRecords:
@@ -51,37 +52,62 @@ class playerBattingRecords:
             self.cricclubs_data["batting"]["ryan_bat"]
         )
         self.player_dfs["Ryan Jones"][1]["Name"] = "Ryan Jones"
+        self.player_dfs["Aaron Varghese"] = pd.read_html(
+            self.cricclubs_data["batting"]["aaron_bat"]
+        )
+        self.player_dfs["Aaron Varghese"][1]["Name"] = "Aaron Varghese"
 
     def addOutnOrder(self):
-        req = requests.get(self.cricclubs_data["batting"]["sid_bat"])
-        soup = BeautifulSoup(req.content, "lxml")
-        parsed_table = soup.find_all("table")[1]
-        for tag in parsed_table.find_all("a"):
-            if not tag.has_attr("class"):
-                url = "https://cricclubs.com" + tag["href"]
-                match_date = dt.strftime(
-                    dt.strptime(
-                        pd.read_html(url)[8].iloc[1]["Match Details.1"], "%m/%d/%Y"
-                    ),
-                    "%m/%d/%Y",
+        match_info, match_dates = getMatchInfo(self.cricclubs_data, "sid_bat", 4, 6)
+        out_dict = {
+            "c": "Caught",
+            "b": "Bowled",
+            "r": "Run Out",
+            "n": "Not Out",
+            "R": "Retired",
+        }
+        for j in range(0, len(match_info)):
+            match_date = match_dates[j]
+            scorecard = match_info[j]
+            for i in range(0, 25, 3):
+                name = scorecard.iat[i, 0].replace("*", "")
+                if name == "Extras":
+                    break
+                if name == "Dillon Patel":
+                    continue
+                out = scorecard.at[i + 2, "B"]
+                runs = float(scorecard.at[i, "B"])
+                row_change = (
+                    self.player_dfs[name]
+                    .loc[
+                        (self.player_dfs[name]["Match Date"] == match_date)
+                        & (self.player_dfs[name]["Runs"] == runs)
+                    ]
+                    .index.values.astype(int)
                 )
-                scorecard_num = 4 if "Sidath" in pd.read_html(url)[4].columns[0] else 6
-                scorecard = pd.read_html(url)[scorecard_num]
-                for i in range(0, 25, 3):
-                    name = scorecard.iat[i, 0].replace("*", "")
-                    if name == "Extras":
-                        break
-                    if name == "Dillon Patel":
-                        continue
-                    out = scorecard.at[i + 2, "B"]
-                    runs = float(scorecard.at[i, "B"])
-                    self.player_dfs[name]["Batting Order No."] = -1
-                    # print(match_date)
-                    # print(len(self.player_dfs[name][self.player_dfs[name]['Match Date'] == match_date]['Match Date']))
-                    self.player_dfs[name].loc[
-                        (self.player_dfs[name]["Match Date"] == match_date),
-                        "Batting Order No.",
-                    ] = (i / 3) + 1
+                if len(row_change) != 0:
+                    row_change = row_change[0]
+                    self.player_dfs[name].at[row_change, "Batting Order No."] = (
+                        i / 3
+                    ) + 1
+                    self.player_dfs[name].at[row_change, "Wicket"] = out_dict[out[0]]
+                    self.player_dfs[name].at[row_change, "Bowler"] = self.getWicket(out)
+
+        self.player_dfs["Sam Thomas"].at[
+            len(self.player_dfs["Sam Thomas"].index) - 1, "Batting Order No."
+        ] = 5.0
+        self.player_dfs["Sam Thomas"].at[
+            len(self.player_dfs["Sam Thomas"].index) - 1, "Wicket"
+        ] = "Not Out"
+
+    def getWicket(self, out):
+        if out[0] == "b":
+            return out[2:]
+        if out[0] == "c":
+            index = out.find(" b ")
+            return out[index + 2 :]
+        else:
+            return "Not Applicable"
 
     def clean(self):
         for i in self.player_dfs:
@@ -92,7 +118,9 @@ class playerBattingRecords:
                 index=len(self.player_dfs[i].index) - 1
             )
             self.player_dfs[i] = self.player_dfs[i][self.player_dfs[i].Runs != "DNB"]
-            self.player_dfs[i] = self.player_dfs[i][self.player_dfs[i].Balls != 0]
+            self.player_dfs[i] = self.player_dfs[i][
+                self.player_dfs[i].Balls != 0
+            ]  # TODO: fix this
             self.player_dfs[i]["Runs"] = (
                 self.player_dfs[i]["Runs"].replace("\*", "", regex=True).astype(float)
             )
@@ -101,10 +129,12 @@ class playerBattingRecords:
                 self.player_dfs[i]["Match Date"], dtype="string"
             )
 
+        self.addOutnOrder()
+
+    def getPlayers(self):
         return self.player_dfs
 
     def test(self):
         self.clean()
-        self.addOutnOrder()
         for i in self.player_dfs.values():
             print(i)

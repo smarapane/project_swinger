@@ -10,17 +10,17 @@
             "sam_bat": "https://cricclubs.com/MasonCricketLeague/playerBattingRecords.do?playerId=1731085&league=6&clubId=15229",
             "zubin_bat": "https://cricclubs.com/MasonCricketLeague/playerBattingRecords.do?playerId=1731084&league=6&clubId=15229",
             "vibhav_bat": "https://cricclubs.com/MasonCricketLeague/playerBattingRecords.do?playerId=1713471&league=6&clubId=15229",
-            "ryan_bat": "https://cricclubs.com/MasonCricketLeague/playerBattingRecords.do?playerId=1731081&league=6&clubId=15229"
-
+            "ryan_bat": "https://cricclubs.com/MasonCricketLeague/playerBattingRecords.do?playerId=1731081&league=6&clubId=15229",
+            "aaron_bat": "https://cricclubs.com/MasonCricketLeague/playerBattingRecords.do?playerId=1748793&clubId=15229"
     },
 
     "bowling":
     {
         "sid_bowl": "https://cricclubs.com/MasonCricketLeague/playerBowlingRecords.do?playerId=1720766&league=6&clubId=15229",
-        "vardhu_bowl": "https://cricclubs.com/MasonCricketLeague/playerBowlingRecords.do?playerId=1706549&league=6&clubId=15229",
         "teja_bowl": "https://cricclubs.com/MasonCricketLeague/playerBowlingRecords.do?playerId=1705621&league=6&clubId=15229",
         "sam_bowl": "https://cricclubs.com/MasonCricketLeague/playerBowlingRecords.do?playerId=1731085&league=6&clubId=15229",
-        "vibhav bat": "https://cricclubs.com/MasonCricketLeague/playerBowlingRecords.do?playerId=1713471&league=6&clubId=15229"
-
+        "vibhav_bowl": "https://cricclubs.com/MasonCricketLeague/playerBowlingRecords.do?playerId=1713471&league=6&clubId=15229",
+        "aaron_bowl": "https://cricclubs.com/MasonCricketLeague/playerBowlingRecords.do?playerId=1748793&clubId=15229",
+        "vardhu_bowl": "https://cricclubs.com/MasonCricketLeague/playerBowlingRecords.do?playerId=1706549&league=6&clubId=15229"
     }
 }

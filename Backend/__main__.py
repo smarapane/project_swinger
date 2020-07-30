@@ -2,6 +2,7 @@ from Records.playerBattingRecords import playerBattingRecords
 from Records.playerBowlingRecords import playerBowlingRecords
 from projections import Projections
 import os
+import pandas as pd
 
 
 bat = playerBattingRecords()
@@ -21,6 +22,16 @@ while True:
 
     view = input("I would like to: ")
     os.system("cls")
+
+    if view == "save":
+        pbat = pd.concat(bat.getPlayers())
+        pbowl = pd.concat(bowl.getPlayers())
+        pbat.to_csv(
+            r"C:\Users\smara\OneDrive - University of Cincinnati\project_swinger\pbat.csv"
+        )
+        pbowl.to_csv(
+            r"C:\Users\smara\OneDrive - University of Cincinnati\project_swinger\pbowl.csv"
+        )
 
     if view == "btr":
         players = bat.getPlayers()

@@ -1,34 +1,21 @@
 import requests
+import os
 from Backend.Records.playerBattingRecords import playerBattingRecords
 from Backend.Records.playerBowlingRecords import playerBowlingRecords
 from Backend.projections import Projections
-from celery import Celery
-
-# from celery.schedules import crontab
 from flask import Flask, request
 from settings import BOT_ID
 
 flask_app = Flask(__name__)
-celery_app = Celery()
-
 pbat = playerBattingRecords()
 pbowl = playerBowlingRecords()
-Proj = Projections(pbat.clean(), pbowl.clean())
 pbatters = pbat.getPlayers()
 pbowlers = pbowl.getPlayers()
+Proj = Projections()
 
-"""
+
 def updateStats():
     Proj = Projections(pbat.clean(), pbowl.clean())
-
-
-@celery_app.on_after_configure.connect
-def scheduleUpdate(sender, **kwargs):
-    sender.add_periodic_task(
-        crontab(hour=0, minute=0, day_of_week=[0, 1, 2, 3, 4, 5, 6]), updateStats()
-    )
-
-"""
 
 
 @flask_app.route("/", methods=["GET"])
@@ -99,5 +86,5 @@ def send_message(message):
 
 
 if __name__ == "__main__":
-    # celery_app.start()
+    updateStats()
     flask_app.run()

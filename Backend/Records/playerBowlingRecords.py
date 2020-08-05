@@ -4,7 +4,7 @@ import json
 
 class playerBowlingRecords:
     def __init__(self):
-        data = open("cricclubs_data/cricclubs_data.json")
+        data = open("Backend/cricclubs_data/cricclubs_data.json")
         self.cricclubs_data = json.load(data)
         self.player_dfs = dict()
 
@@ -44,6 +44,7 @@ class playerBowlingRecords:
             self.player_dfs[i]["Match Date"] = pd.to_datetime(
                 self.player_dfs[i]["Match Date"]
             )
+        return self.player_dfs
 
     def getPlayers(self):
         return self.player_dfs

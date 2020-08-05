@@ -1,14 +1,11 @@
 import pandas as pd
-import requests
-from bs4 import BeautifulSoup
 import json
-from datetime import datetime as dt
-from helper import getMatchInfo
+from Backend.helper import getMatchInfo
 
 
 class playerBattingRecords:
     def __init__(self):
-        data = open("cricclubs_data/cricclubs_data.json")
+        data = open("Backend/cricclubs_data/cricclubs_data.json")
         self.cricclubs_data = json.load(data)
         self.player_dfs = dict()
 
@@ -65,6 +62,7 @@ class playerBattingRecords:
             "r": "Run Out",
             "n": "Not Out",
             "R": "Retired",
+            "S": "Stumped",
         }
         for j in range(0, len(match_info)):
             match_date = match_dates[j]
@@ -130,6 +128,7 @@ class playerBattingRecords:
             )
 
         self.addOutnOrder()
+        return self.player_dfs
 
     def getPlayers(self):
         return self.player_dfs

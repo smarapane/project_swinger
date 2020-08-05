@@ -7,7 +7,7 @@ import pandas as pd
 
 bat = playerBattingRecords()
 bowl = playerBowlingRecords()
-projection = Projections(bat, bowl)
+projection = Projections((bat.clean(), bowl.clean()))
 
 while True:
     input("Hit anything to continue")

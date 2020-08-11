@@ -36,7 +36,16 @@ class playerBowlingRecords:
     def clean(self):
         for i in self.player_dfs:
             self.player_dfs[i] = self.player_dfs[i][1][
-                ["Name", "Match Date", "Overs", "Runs", "Wkts", "Econ", "Wides"]
+                [
+                    "Name",
+                    "Match Date",
+                    "Against",
+                    "Overs",
+                    "Runs",
+                    "Wkts",
+                    "Econ",
+                    "Wides",
+                ]
             ]
             self.player_dfs[i] = self.player_dfs[i].drop(
                 index=len(self.player_dfs[i].index) - 1

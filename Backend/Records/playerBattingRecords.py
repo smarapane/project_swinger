@@ -97,20 +97,23 @@ class playerBattingRecords:
         self.player_dfs["Sam Thomas"].at[
             len(self.player_dfs["Sam Thomas"].index) - 1, "Wicket"
         ] = "Not Out"
+        self.player_dfs["Sam Thomas"].at[
+            len(self.player_dfs["Sam Thomas"].index) - 1, "Bowler"
+        ] = "Not Applicable"
 
     def getWicket(self, out):
         if out[0] == "b":
             return out[2:]
-        if out[0] == "c":
+        if out[0] == "c" or out[0] == "s":
             index = out.find(" b ")
-            return out[index + 2 :]
+            return out[index + 3 :]
         else:
             return "Not Applicable"
 
     def clean(self):
         for i in self.player_dfs:
             self.player_dfs[i] = self.player_dfs[i][1][
-                ["Name", "Match Date", "Runs", "Balls", "SR"]
+                ["Name", "Match Date", "Against", "Runs", "Balls", "SR"]
             ]
             self.player_dfs[i] = self.player_dfs[i].drop(
                 index=len(self.player_dfs[i].index) - 1

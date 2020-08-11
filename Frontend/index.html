@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Mason Cricket League Statistics and Projections</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="images/cricket-ball.png">
+  <link rel="stylesheet" type="text/css" href="main.css">
+</head>
+<body>
+
+<div id="mainHead">
+  <h1>Mason Cricket League</h1>
+  <h2>Statistics and Projections</h2>
+  <h3>Sidath Marapane</h3>
+</div>
+
+<div id="who">
+  <span>Select a player:</span>
+  <form action="/" method= "POST">
+    <select name= "player_selection" class= "dropdown">
+      {% for player in players %}
+        <option value="{{player}}" class= "names">{{player}}</option>"    
+      {% endfor %}
+      </select>
+      <div id="containter">
+        <div id= "circle-bckgrnd">
+          <input type="image" src= "images/newball.png" class= "button">
+        </div>
+      </div>
+    </form>
+</div>
+</body>
+</html>

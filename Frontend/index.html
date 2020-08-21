@@ -4,6 +4,7 @@
   <title>Mason Cricket League Statistics and Projections</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script> 
   <link rel="icon" type="image/png" href="images/cricket-ball.png">
   <link rel="stylesheet" type="text/css" href="main.css">
 </head>
@@ -17,18 +18,66 @@
 
 <div id="who">
   <span>Select a player:</span>
-  <form action="/" method= "POST">
-    <select name= "player_selection" class= "dropdown">
-      {% for player in players %}
-        <option value="{{player}}" class= "names">{{player}}</option>"    
-      {% endfor %}
-      </select>
-      <div id="containter">
-        <div id= "circle-bckgrnd">
-          <input type="image" src= "images/newball.png" class= "button">
-        </div>
+  <select name= "player_selection" class= "dropdown">
+    {% for player in players %}
+      <option value="{{player}}" class= "names">{{player}}</option>"    
+    {% endfor %}
+    </select>
+      <div id= "button-stuff">
+        <input type="image" src= "images/newball.png" class= "button">
       </div>
-    </form>
+</div>
+
+<div id="proj"></div>
+
+<div id="graphs">
+  <div id="graph-0"></div>
+  <div id="graph-1"></div>
+  <div class=afterpos>
+    <div id="graph-2" class="batpos"></div>
+    <div id="graph-3" class="batpos"></div>
+  </div>
+  <div id="graph-4" class="wicket"></div>
+  <div id="graph-5" class="wicket"></div>
+  <div id="graph-6"></div>
+  <div id="graph-7" class="overtime"></div>
+  <div id="graph-8" class="overtime"></div>
+  <div id="graph-9" class="overtime"></div>
+  <div id="graph-10" class="perteam"></div>
+  <div id="graph-11" class="perteam"></div>
+  <div id="graph-12"></div>
 </div>
 </body>
+<script>
+  $(document).ready(function(){
+    $('#who').on('click', '.button', function(){
+       var player = $(".dropdown").val();
+       $.ajax({
+        url: "/get_player",
+        type: "get",
+        data: {player: player},
+        success: function(response) {
+
+          function addImage(clsn) {
+            return function() {
+              $(divs[clsn]).html('<img src='+response.graphs[clsn]+'>',);
+            }
+          }
+
+          $("#proj").fadeOut(400, function() {
+            $("#proj").html('<p>'+response.bat_proj.toString()+'</p>'+'<p>'+response.bowl_proj.toString()+'</p>');
+            $("#proj").fadeIn(400);
+          });
+          var divs = ['#graph-0', '#graph-1', '#graph-2', '#graph-3', '#graph-4', '#graph-5', '#graph-6', '#graph-7', '#graph-8', '#graph-9', '#graph-10', '#graph-11', '#graph-12']
+          for(var i = 0; i < divs.length; i++) {
+            $(divs[i]).fadeOut(400, addImage(i));
+          }          
+          for(var i = 0; i < response.graphs.length; i++) {
+            $(divs[i]).fadeIn(400);
+          }          
+        }
+       })
+    });
+  });
+</script>
 </html>

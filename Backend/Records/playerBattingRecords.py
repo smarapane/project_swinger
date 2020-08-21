@@ -1,6 +1,9 @@
 import pandas as pd
 import json
+import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 from Backend.helper import getMatchInfo
+import sys
 
 
 class playerBattingRecords:
@@ -113,15 +116,24 @@ class playerBattingRecords:
     def clean(self):
         for i in self.player_dfs:
             self.player_dfs[i] = self.player_dfs[i][1][
-                ["Name", "Match Date", "Against", "Runs", "Balls", "SR"]
+                ["Name", "Match Date", "Against", "Winner", "Runs", "Balls", "SR"]
             ]
             self.player_dfs[i] = self.player_dfs[i].drop(
                 index=len(self.player_dfs[i].index) - 1
             )
+            self.player_dfs[i].rename(columns={"Winner": "Win"}, inplace=True)
+            self.player_dfs[i].loc[
+                (self.player_dfs[i]["Win"] == "Sidath's Big Bad Boofas"), "Win"
+            ] = "W"
+            self.player_dfs[i].loc[
+                (
+                    (self.player_dfs[i]["Win"] != "Sidath's Big Bad Boofas")
+                    & (self.player_dfs[i]["Win"] != "W")
+                ),
+                "Win",
+            ] = "L"
             self.player_dfs[i] = self.player_dfs[i][self.player_dfs[i].Runs != "DNB"]
-            self.player_dfs[i] = self.player_dfs[i][
-                self.player_dfs[i].Balls != 0
-            ]  # TODO: fix this
+            self.player_dfs[i] = self.player_dfs[i][self.player_dfs[i].Balls != 0]
             self.player_dfs[i]["Runs"] = (
                 self.player_dfs[i]["Runs"].replace("\*", "", regex=True).astype(float)
             )
@@ -136,7 +148,108 @@ class playerBattingRecords:
     def getPlayers(self):
         return self.player_dfs
 
+    def plot_runs(self, player):
+        fig = Figure()
+        axis = fig.add_subplot(1, 1, 1)
+        axis.set_title(f"{player}'s Runs Over Time")
+        axis.set_xlabel("Match Date")
+        axis.set_ylabel("Runs")
+        runs_dfs = self.player_dfs[player].copy()
+        runs_dfs["Match Date"] = pd.to_datetime(runs_dfs["Match Date"])
+        runs_dfs["Match Date"] = runs_dfs["Match Date"].dt.strftime("%m/%d")
+        runs_dfs = runs_dfs.sort_values(by="Match Date", ascending=True)
+        axis.plot(runs_dfs["Match Date"], runs_dfs["Runs"])
+        return fig
+
+    def plot_runs_per_team(self, player):
+        fig = Figure(tight_layout=True)
+        axis = fig.add_subplot(1, 1, 1)
+        teams = self.player_dfs[player]["Against"].unique().tolist()
+        runs = [0 for i in range(len(teams))]
+        total_runs = 0
+
+        for index, row in self.player_dfs[player].iterrows():
+            runs[teams.index(row["Against"])] += row["Runs"]
+            total_runs += row["Runs"]
+
+        wedges, texts, autotexts = axis.pie(
+            runs, labels=teams, autopct="", textprops=dict(color="w")
+        )
+        axis.legend(
+            wedges,
+            teams,
+            title="Teams",
+            loc="upper right",
+            bbox_to_anchor=(1, 1),
+            bbox_transform=plt.gcf().transFigure,
+        )
+
+        for i, a in enumerate(autotexts):
+            a.set_text(f"{round((runs[i]/total_runs) * 100)}%\n({runs[i]} runs)")
+
+        plt.setp(autotexts, size=13, weight="bold")
+        axis.set_title("Runs Per Team")
+        return fig
+
+    def plot_per_batno(self, player, key):
+        fig = Figure()
+        axis = fig.add_subplot(1, 1, 1)
+        axis.scatter(
+            self.player_dfs[player]["Batting Order No."], self.player_dfs[player][key]
+        )
+        axis.set_title(f"{player}'s {key} at Each Batting Order Position'")
+        axis.set_xlabel("Batting Order Number")
+        axis.set_ylabel(key)
+        return fig
+
+    def plot_wicket(self, player):
+        fig = Figure()
+        axis = fig.add_subplot(1, 1, 1)
+        wickets = self.player_dfs[player]["Wicket"].unique().tolist()
+        count = [0 for i in range(len(wickets))]
+        for index, row in self.player_dfs[player].iterrows():
+            count[wickets.index(row["Wicket"])] += 1
+        axis.bar(wickets, count)
+        axis.set_title("Count of Wicket")
+        axis.set_xlabel("Wicket")
+        axis.set_ylabel("Count")
+        return fig
+
+    def plot_bowler(self, player):
+        fig = Figure()
+        axis = fig.add_subplot(1, 1, 1)
+        only_bowlers = self.player_dfs[player].loc[
+            self.player_dfs[player]["Bowler"] != "Not Applicable"
+        ]
+        bowler = only_bowlers["Bowler"].unique().tolist()
+        count = [0 for i in range(len(bowler))]
+        for index, row in only_bowlers.iterrows():
+            count[bowler.index(row["Bowler"])] += 1
+        axis.bar(bowler, count)
+        axis.set_title("Bowlers Who Took Wickets")
+        axis.set_xlabel("Bowler")
+        axis.set_ylabel("Count")
+        return fig
+
+    def table(self, player):
+        fig = Figure()
+        axis = fig.add_subplot(1, 1, 1)
+        player_table = self.player_dfs[player].copy()
+        player_table = player_table.drop(["Name"], axis=1)
+        the_table = axis.table(
+            cellText=player_table.to_numpy().tolist(),
+            colLabels=player_table.columns,
+            loc="center",
+        )
+        the_table.auto_set_column_width(range(10))
+        the_table.auto_set_font_size(False)
+        the_table.set_fontsize(8.1)
+        ax = fig.gca()
+        ax.get_xaxis().set_visible(False)
+        ax.get_yaxis().set_visible(False)
+        axis.axis("off")
+        fig.subplots_adjust(right=0.867)
+        return fig
+
     def test(self):
-        self.clean()
-        for i in self.player_dfs.values():
-            print(i)
+        self.table("Sidath Marapane")

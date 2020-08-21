@@ -1,5 +1,7 @@
 import pandas as pd
 import json
+import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 
 
 class playerBowlingRecords:
@@ -40,6 +42,7 @@ class playerBowlingRecords:
                     "Name",
                     "Match Date",
                     "Against",
+                    "Winner",
                     "Overs",
                     "Runs",
                     "Wkts",
@@ -50,6 +53,17 @@ class playerBowlingRecords:
             self.player_dfs[i] = self.player_dfs[i].drop(
                 index=len(self.player_dfs[i].index) - 1
             )
+            self.player_dfs[i].rename(columns={"Winner": "Win"}, inplace=True)
+            self.player_dfs[i].loc[
+                (self.player_dfs[i]["Win"] == "Sidath's Big Bad Boofas"), "Win"
+            ] = "W"
+            self.player_dfs[i].loc[
+                (
+                    (self.player_dfs[i]["Win"] != "Sidath's Big Bad Boofas")
+                    & (self.player_dfs[i]["Win"] != "W")
+                ),
+                "Win",
+            ] = "L"
             self.player_dfs[i]["Match Date"] = pd.to_datetime(
                 self.player_dfs[i]["Match Date"]
             )
@@ -58,7 +72,74 @@ class playerBowlingRecords:
     def getPlayers(self):
         return self.player_dfs
 
+    def plot_over_time(self, player, key):
+        fig = Figure()
+        axis = fig.add_subplot(1, 1, 1)
+        full_name = {"Wkts": "Wickets", "Econ": "Economy", "Wides": "Wides"}
+        axis.set_title(f"{player}'s {full_name[key]} Over Time")
+        axis.set_xlabel("Match Date")
+        axis.set_ylabel(full_name[key])
+        average_val = self.player_dfs[player].copy()
+        average_val["Match Date"] = pd.to_datetime(average_val["Match Date"])
+        average_val["Match Date"] = average_val["Match Date"].dt.strftime("%m/%d")
+        average_val = average_val.groupby("Match Date").mean()
+        average_val = average_val.sort_values(by="Match Date", ascending=True)
+        axis.plot(average_val.index, average_val[key])
+        return fig
+
+    def plot_per_team(self, player, key):
+        fig = Figure()
+        axis = fig.add_subplot(1, 1, 1)
+        full_name = {"Wkts": "Wickets", "Runs": "Runs"}
+        teams = self.player_dfs[player]["Against"].unique().tolist()
+        vals = [0 for i in range(len(teams))]
+        total_vals = 0
+
+        for index, row in self.player_dfs[player].iterrows():
+            vals[teams.index(row["Against"])] += row[key]
+            total_vals += row[key]
+
+        wedges, texts, autotexts = axis.pie(
+            vals, labels=teams, autopct="", textprops=dict(color="w")
+        )
+        axis.legend(
+            wedges,
+            teams,
+            title="Teams",
+            loc="upper right",
+            bbox_to_anchor=(1, 1),
+            bbox_transform=plt.gcf().transFigure,
+        )
+
+        for i, a in enumerate(autotexts):
+            a.set_text(
+                f"{round((vals[i]/total_vals) * 100)}%\n({vals[i]} {key.lower()})"
+            )
+
+        plt.setp(autotexts, size=8, weight="bold")
+        axis.set_title(f"{full_name[key]} Per Team")
+        return fig
+
+    def table(self, player):
+        fig = Figure()
+        axis = fig.add_subplot(1, 1, 1)
+        player_table = self.player_dfs[player].copy()
+        player_table = player_table.drop(["Name"], axis=1)
+        player_table["Match Date"] = pd.to_datetime(player_table["Match Date"]).dt.date
+        the_table = axis.table(
+            cellText=player_table.to_numpy().tolist(),
+            colLabels=player_table.columns,
+            loc="center",
+        )
+        the_table.auto_set_column_width(range(10))
+        the_table.auto_set_font_size(False)
+        the_table.set_fontsize(10)
+        the_table.scale(1, 1.5)
+        ax = plt.gca()
+        ax.get_xaxis().set_visible(False)
+        ax.get_yaxis().set_visible(False)
+        axis.axis("off")
+        return fig
+
     def test(self):
-        self.clean()
-        for i in self.player_dfs:
-            print(self.player_dfs[i])
+        self.plot_over_time("Sidath Marapane", "Wkts")

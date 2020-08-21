@@ -1,4 +1,3 @@
-@import url(fontawesome-all.min.css);
 
 body {
 	background-image: url(images/cool-background.png);
@@ -11,9 +10,12 @@ body {
 	bottom: 5%;
 	position: absolute;
 	padding: 10px;
+	-webkit-animation: fadein 3s; /* Safari, Chrome and Opera > 12.1 */
+	-moz-animation: fadein 3s; /* Firefox < 16 */
+		 animation: fadein 3s;
 }
 
-h1, h2, h3 {
+h1, h2, h3{
 	color: white;
 	text-align: left;
 	font-family: "Courier New", monospace;
@@ -25,7 +27,12 @@ h1, h2, h3 {
 	width: 800px;
 	border: 3px solid black;
 	margin-top: 150px;
+	position: relative;
 	background-color: rgba(255, 255, 255, 0.8);
+	-webkit-animation: fademove 2s; /* Safari, Chrome and Opera > 12.1 */
+	-moz-animation: fademove 2s; /* Firefox < 16 */
+		 animation: fademove 2s;
+
 }
 
 #who span {
@@ -42,7 +49,7 @@ h1, h2, h3 {
 	font-weight: 600;
 	text-align-last: center;
 	width: 215px;
-	top: 7px;
+	top: 9px;
 	left: 36%;
 	position: relative;
 }
@@ -51,11 +58,7 @@ option {
 	font-weight: 600;
 }
 
-#container {
-	height:22px;
-	width:22px;
-}
-#circle-bckgrnd {
+#button-stuff {
 	height:44px;
 	width:44px;
     background-color: rgba(150, 150, 150, 0.6);
@@ -66,7 +69,7 @@ option {
 	margin-top:-3.25%;
 }
 
-#circle-bckgrnd:hover {
+#button-stuff:hover {
 	height:44px;
 	width:44px;
 	background-color: rgba(90, 90, 90, .6);
@@ -85,4 +88,85 @@ option {
 	position: relative;
 	height: 40px;
 	width: 40px;
+}
+
+#proj {
+	display: none;
+	margin: 0 auto;
+	padding: 10px;
+	width: 600px;
+	border: 3px solid black;
+	margin-top: 30px;
+	position: relative;
+	background-color: rgba(255, 255, 255, 0.8);
+}
+
+p {	
+	color: black;
+	display: flex;
+	justify-content: center;
+	text-align: center;
+	font-family: "Courier New", monospace;
+	font-size: 20px;
+	font-weight: 550;
+}
+
+#graphs {
+	text-align: center;
+	margin-top: 10px;
+}
+
+.afterpos {
+	float: left;
+	padding: 1px;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	width: 10%;
+}
+
+.afterpos::after {
+	content: "";
+	clear: both;
+	display: table;
+}
+
+@keyframes fadein {
+    from { opacity: 0; }
+	to   { opacity: 1; }
+}
+
+/* Firefox < 16 */
+@-moz-keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* Safari, Chrome and Opera > 12.1 */
+@-webkit-keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes fademove {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+	from { top: -50px; }
+	to 	 { top: 0px; }
+}
+
+/* Firefox < 16 */
+@-moz-keyframes fademove {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+	from { top: -50px; }
+	to 	 { top: 0px; }
+}
+
+/* Safari, Chrome and Opera > 12.1 */
+@-webkit-keyframes fademove {
+	from { opacity: 0; }
+    to   { opacity: 1; }
+	from { top: -50px; }
+	to 	 { top: 0px; }
 }

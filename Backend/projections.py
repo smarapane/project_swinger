@@ -8,6 +8,8 @@ class Projections:
     def __init__(self, batters, bowlers):
         self.player_batting_dfs = batters
         self.player_bowling_dfs = bowlers
+        self.bat_stats = {}
+        self.bowl_stats = {}
 
     def predict_batting(self, player):
         sc = StandardScaler()
@@ -59,7 +61,8 @@ class Projections:
             )
             RsquaredBalls = lin.score(x, y)
 
-        return [Runs, Balls, RsquaredRuns, RsquaredBalls]
+        self.bat_stats = [Runs, Balls, RsquaredRuns, RsquaredBalls]
+        return self.bat_stats
 
     def predict_bowling(self, player):
         sc = StandardScaler()
@@ -100,9 +103,12 @@ class Projections:
             )
             lin.fit(x, y)
 
-            Economy = lin.predict(
-                self.player_bowling_dfs[player][["Wkts", "Econ", "Wides"]].tail(1)
-            )[0]
+            Economy = round(
+                lin.predict(
+                    self.player_bowling_dfs[player][["Wkts", "Econ", "Wides"]].tail(1)
+                )[0],
+                2,
+            )
             RsquaredEcon = lin.score(x, y)
 
             y = (
@@ -119,4 +125,12 @@ class Projections:
             )
             RsquaredWd = lin.score(x, y)
 
-        return [Wickets, Economy, Wides, RsquaredWkt, RsquaredEcon, RsquaredWd]
+        self.bowl_stats = [
+            Wickets,
+            Economy,
+            Wides,
+            RsquaredWkt,
+            RsquaredEcon,
+            RsquaredWd,
+        ]
+        return self.bowl_stats

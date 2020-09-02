@@ -8,6 +8,9 @@ import sys
 
 class playerBattingRecords:
     def __init__(self):
+        """
+        Go into json file and scrape player stats from their personal pages
+        """
         data = open("Backend/cricclubs_data/cricclubs_data.json")
         self.cricclubs_data = json.load(data)
         self.player_dfs = dict()
@@ -58,6 +61,10 @@ class playerBattingRecords:
         self.player_dfs["Aaron Varghese"][1]["Name"] = "Aaron Varghese"
 
     def addOutnOrder(self):
+        """
+        For each player, go to the link provided for each individual game in their personal stats
+        and add the wicket and bowler from each scorecard.
+        """
         match_info, match_dates = getMatchInfo(self.cricclubs_data, "sid_bat", 4, 6)
         out_dict = {
             "c": "Caught",
@@ -73,8 +80,10 @@ class playerBattingRecords:
             for i in range(0, 25, 3):
                 name = scorecard.iat[i, 0].replace("*", "")
                 if name == "Extras":
+                    # We have reached all of the players on the scorecard
                     break
                 if name == "Dillon Patel":
+                    # We traded dillon; there's bad blood ¯\_(ツ)_/¯
                     continue
                 out = scorecard.at[i + 2, "B"]
                 runs = float(scorecard.at[i, "B"])
@@ -86,6 +95,7 @@ class playerBattingRecords:
                     ]
                     .index.values.astype(int)
                 )
+                # row_change is a list that contains the row number of the game to add the stats to
                 if len(row_change) != 0:
                     row_change = row_change[0]
                     self.player_dfs[name].at[row_change, "Batting Order No."] = (
@@ -103,8 +113,13 @@ class playerBattingRecords:
         self.player_dfs["Sam Thomas"].at[
             len(self.player_dfs["Sam Thomas"].index) - 1, "Bowler"
         ] = "Not Applicable"
+        # I got lazy; my code does not account for whether or not a player scores the same number of
+        # runs in the same number of balls in two matches on a given day. I had to hardcore Sam's stats.
 
     def getWicket(self, out):
+        """
+        Return the bowler who took the wicket
+        """
         if out[0] == "b":
             return out[2:]
         if out[0] == "c" or out[0] == "s":
@@ -114,6 +129,9 @@ class playerBattingRecords:
             return "Not Applicable"
 
     def clean(self):
+        """
+        Organize the data; drop unnecessary columns and add columns
+        """
         for i in self.player_dfs:
             self.player_dfs[i] = self.player_dfs[i][1][
                 ["Name", "Match Date", "Against", "Winner", "Runs", "Balls", "SR"]
@@ -146,9 +164,15 @@ class playerBattingRecords:
         return self.player_dfs
 
     def getPlayers(self):
+        """
+        Return list of player dataframes
+        """
         return self.player_dfs
 
     def plot_runs(self, player):
+        """
+        Plot the runs over time in line plot
+        """
         fig = Figure()
         axis = fig.add_subplot(1, 1, 1)
         axis.set_title(f"{player}'s Runs Over Time")
@@ -162,6 +186,9 @@ class playerBattingRecords:
         return fig
 
     def plot_runs_per_team(self, player):
+        """
+        Plot runs per team in pie chart
+        """
         fig = Figure(tight_layout=True)
         axis = fig.add_subplot(1, 1, 1)
         teams = self.player_dfs[player]["Against"].unique().tolist()
@@ -192,6 +219,9 @@ class playerBattingRecords:
         return fig
 
     def plot_per_batno(self, player, key):
+        """
+        Plot given key (Runs or SR) at each batting position.
+        """
         fig = Figure()
         axis = fig.add_subplot(1, 1, 1)
         axis.scatter(
@@ -203,6 +233,9 @@ class playerBattingRecords:
         return fig
 
     def plot_wicket(self, player):
+        """
+        Plot type of wicket in bar graph
+        """
         fig = Figure()
         axis = fig.add_subplot(1, 1, 1)
         wickets = self.player_dfs[player]["Wicket"].unique().tolist()
@@ -216,6 +249,9 @@ class playerBattingRecords:
         return fig
 
     def plot_bowler(self, player):
+        """
+        Plot bowler who tooks wickets in bar graph
+        """
         fig = Figure()
         axis = fig.add_subplot(1, 1, 1)
         only_bowlers = self.player_dfs[player].loc[
@@ -232,6 +268,9 @@ class playerBattingRecords:
         return fig
 
     def table(self, player):
+        """
+        Create table with all stats
+        """
         fig = Figure()
         axis = fig.add_subplot(1, 1, 1)
         player_table = self.player_dfs[player].copy()
@@ -250,6 +289,3 @@ class playerBattingRecords:
         axis.axis("off")
         fig.subplots_adjust(right=0.867)
         return fig
-
-    def test(self):
-        self.table("Sidath Marapane")

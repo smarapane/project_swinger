@@ -20,11 +20,17 @@ def updateStats():
 
 @flask_app.route("/", methods=["GET"])
 def retDrBob():
+    """
+    Did I mention Dr. Bob is training for a marathon?
+    """
     return "Dr. Bob is running!"
 
 
 @flask_app.route("/", methods=["POST"])
 def webhook():
+    """
+    Find out if Dr. Bob is being talked to in the groupchat
+    """
     data = request.get_json()
 
     if data["name"] != "Dr. Bob" and "dr bob" in data["text"]:
@@ -34,6 +40,9 @@ def webhook():
 
 
 def parseMessage(message, data):
+    """
+    Given a reply to Dr. Bob, parse the reply and send a message depending on that reply
+    """
     msg = "I didn't quite catch that. "
     if (
         "hi" in message.lower()
@@ -77,6 +86,9 @@ def parseMessage(message, data):
 
 
 def send_message(message):
+    """
+    Text the message to the given group chat
+    """
     url = "https://api.groupme.com/v3/bots/post"
 
     data = {"bot_id": BOT_ID, "text": message}
@@ -86,5 +98,4 @@ def send_message(message):
 
 
 if __name__ == "__main__":
-    updateStats()
     flask_app.run()

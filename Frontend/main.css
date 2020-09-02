@@ -116,19 +116,25 @@ p {
 	margin-top: 10px;
 }
 
-.afterpos {
+#graph-2, #graph-4, #graph-11 {
 	float: left;
-	padding: 1px;
-	display: block;
-	margin-left: auto;
-	margin-right: auto;
-	width: 10%;
+	width: 50%;
 }
 
-.afterpos::after {
-	content: "";
-	clear: both;
-	display: table;
+#graph-3, #graph-5, #graph-12 {
+	float: right;
+	width: 50%;
+}
+
+#graph-8, #graph-9, #graph-10 {
+	width: 33.33%;
+	height: 33.33%;
+	float: left;
+}
+
+.resize img {
+	height: 98%;
+	width: 98%;
 }
 
 @keyframes fadein {

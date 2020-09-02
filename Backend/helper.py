@@ -4,8 +4,14 @@ import json
 from datetime import datetime as dt
 import pandas as pd
 
+# I thought I would have to use this method for bowling stats as well
+# which did not end up happening
+
 
 def getMatchInfo(data, innings, scorecard_loc1, scorecard_loc2):
+    """
+    Get the links from the personal websites and return match information
+    """
     req = requests.get(data["batting"][innings])
     soup = BeautifulSoup(req.content, "lxml")
     parsed_table = soup.find_all("table")[1]

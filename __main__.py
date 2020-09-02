@@ -16,26 +16,34 @@ app = Flask(
 bat = playerBattingRecords()
 bowl = playerBowlingRecords()
 projection = Projections(bat.clean(), bowl.clean())
+projection.predict_batting()
+projection.predict_bowling()
 batters = bat.getPlayers()
 bowlers = bowl.getPlayers()
 
 
 @app.route("/get_player", methods=["GET"])
 def get_stats():
+    """
+    When the button is pushed, return the projections and graphs
+    """
     player = request.args.get("player")
     graphs = get_graphs(player)
-    stats = projection.predict_batting(player)
+    stats = projection.get_batter(player)
     plural = get_plural("bat", stats)
     bat_stats = f"{player.split()[0]} is projected to bat {stats[0]} {plural[0]} in {stats[1]} {plural[1]}."
     bowl_stats = "He did not bowl this season."
     if player in bowlers.keys():
-        stats = projection.predict_bowling(player)
+        stats = projection.get_bowler(player)
         plural = get_plural("bowl", stats)
         bowl_stats = f"He is also projected to bowl {stats[0]} {plural[0]} and {stats[2]} {plural[1]} at an economy of {stats[1]} {plural[2]} an over."
     return jsonify({"bat_proj": bat_stats, "bowl_proj": bowl_stats, "graphs": graphs})
 
 
 def get_plural(innings, stats):
+    """
+    If a player has 1 of anything, make the noun singular
+    """
     plural = []
     if innings == "bat":
         plural_runs = "runs" if stats[0] != 1 else "run"
@@ -50,15 +58,19 @@ def get_plural(innings, stats):
 
 
 def get_graphs(player):
+    """
+    Get graphs for specified player and return a B64 string
+    of the pngs
+    """
     png_strings = []
     graph_funcs = [
-        bat.plot_runs,
+        bat.table,
         bat.plot_runs_per_team,
         partial(bat.plot_per_batno, key="Runs"),
         partial(bat.plot_per_batno, key="SR"),
         bat.plot_wicket,
         bat.plot_bowler,
-        bat.table,
+        bat.plot_runs,
     ]
     for func in graph_funcs:
         fig = func(player=player)
@@ -69,12 +81,12 @@ def get_graphs(player):
         png_strings.append(pngImageB64String)
     if player in bowlers.keys():
         graph_funcs = [
+            bowl.table,
             partial(bowl.plot_over_time, key="Wkts"),
             partial(bowl.plot_over_time, key="Econ"),
             partial(bowl.plot_over_time, key="Wides"),
             partial(bowl.plot_per_team, key="Wkts"),
             partial(bowl.plot_per_team, key="Runs"),
-            bowl.table,
         ]
         for func in graph_funcs:
             fig = func(player=player)
@@ -88,10 +100,11 @@ def get_graphs(player):
 
 @app.route("/", methods=["GET"])
 def home():
+    """
+    Main page
+    """
     return render_template("index.html", players=bat.getPlayers())
 
 
 if __name__ == "__main__":
     app.run()
-    # bat.test()
-    # bowl.test()

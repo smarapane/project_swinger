@@ -6,6 +6,9 @@ from matplotlib.figure import Figure
 
 class playerBowlingRecords:
     def __init__(self):
+        """
+        Get player data from json file which contains the personal stats site
+        """
         data = open("Backend/cricclubs_data/cricclubs_data.json")
         self.cricclubs_data = json.load(data)
         self.player_dfs = dict()
@@ -36,6 +39,9 @@ class playerBowlingRecords:
         self.player_dfs["Vibhav Kavoori"][1]["Name"] = "Vibhav Kavoori"
 
     def clean(self):
+        """
+        Clean the dataframes
+        """
         for i in self.player_dfs:
             self.player_dfs[i] = self.player_dfs[i][1][
                 [
@@ -70,9 +76,15 @@ class playerBowlingRecords:
         return self.player_dfs
 
     def getPlayers(self):
+        """
+        Return player dataframes
+        """
         return self.player_dfs
 
     def plot_over_time(self, player, key):
+        """
+        Plot given key (Wkts, Econ, Wides) over time in line plot
+        """
         fig = Figure()
         axis = fig.add_subplot(1, 1, 1)
         full_name = {"Wkts": "Wickets", "Econ": "Economy", "Wides": "Wides"}
@@ -88,6 +100,9 @@ class playerBowlingRecords:
         return fig
 
     def plot_per_team(self, player, key):
+        """
+        Plot given key (Wkts, Runs) in pie chart
+        """
         fig = Figure()
         axis = fig.add_subplot(1, 1, 1)
         full_name = {"Wkts": "Wickets", "Runs": "Runs"}
@@ -121,6 +136,9 @@ class playerBowlingRecords:
         return fig
 
     def table(self, player):
+        """
+        Create table of player bowling stats
+        """
         fig = Figure()
         axis = fig.add_subplot(1, 1, 1)
         player_table = self.player_dfs[player].copy()
@@ -140,6 +158,3 @@ class playerBowlingRecords:
         ax.get_yaxis().set_visible(False)
         axis.axis("off")
         return fig
-
-    def test(self):
-        self.plot_over_time("Sidath Marapane", "Wkts")
